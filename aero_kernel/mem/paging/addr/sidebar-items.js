@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["align_down","align_up","is_aligned"],"struct":["PhysAddr","PhysAddrNotValid","VirtAddr","VirtAddrNotValid"]};
+window.SIDEBAR_ITEMS = {"enum":["ReadErr"],"fn":["align_down","align_up","is_aligned"],"struct":["PhysAddr","PhysAddrNotValid","VirtAddr"]};

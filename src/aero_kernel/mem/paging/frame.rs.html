@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `aero_kernel/src/mem/paging/frame.rs`."><title>frame.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-be46fdc453a55015.css"><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../aero_kernel/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `aero_kernel/src/mem/paging/frame.rs`."><title>frame.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fbd14db5c88ed452.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aero_kernel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (2036fdd24 2023-03-27)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-d4a1a279bad1a0c0.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-9ade54abd4bd73c8.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../aero_kernel/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -630,6 +630,27 @@
 <a href="#630" id="630">630</a>
 <a href="#631" id="631">631</a>
 <a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021-2023 The Aero Project Developers.
  *
@@ -654,7 +675,7 @@
 <span class="kw">use </span>core::sync::atomic::{AtomicUsize, Ordering};
 
 <span class="kw">use </span>alloc::vec::Vec;
-<span class="kw">use </span>limine::{LimineMemmapEntry, LimineMemoryMapEntryType, NonNullPtr};
+<span class="kw">use </span>limine::{MemmapEntry, MemoryMapEntryType, NonNullPtr};
 <span class="kw">use </span>spin::Once;
 
 <span class="kw">use </span><span class="kw">super</span>::mapper::<span class="kw-2">*</span>;
@@ -666,7 +687,35 @@
 <span class="kw">use </span><span class="kw">crate</span>::utils::bitmap::Bitmap;
 <span class="kw">use </span><span class="kw">crate</span>::utils::sync::Mutex;
 
-<span class="kw">static </span>BUDDY_SIZE: [u64; <span class="number">3</span>] = [Size4KiB::SIZE, Size4KiB::SIZE * <span class="number">4</span>, Size2MiB::SIZE];
+<span class="kw">const </span>BUDDY_SIZE: [u64; <span class="number">10</span>] = [
+    Size4KiB::SIZE,       <span class="comment">// 4 KiB
+    </span>Size4KiB::SIZE * <span class="number">2</span>,   <span class="comment">// 8 KiB
+    </span>Size4KiB::SIZE * <span class="number">4</span>,   <span class="comment">// 16 KiB
+    </span>Size4KiB::SIZE * <span class="number">8</span>,   <span class="comment">// 32 KiB
+    </span>Size4KiB::SIZE * <span class="number">16</span>,  <span class="comment">// 64 KiB
+    </span>Size4KiB::SIZE * <span class="number">32</span>,  <span class="comment">// 128 KiB
+    </span>Size4KiB::SIZE * <span class="number">64</span>,  <span class="comment">// 256 KiB
+    </span>Size4KiB::SIZE * <span class="number">128</span>, <span class="comment">// 512 KiB
+    </span>Size4KiB::SIZE * <span class="number">256</span>, <span class="comment">// 1 MiB
+    </span>Size2MiB::SIZE,       <span class="comment">// 2 MiB
+</span>];
+
+<span class="kw">const fn </span>order_from_size(size: u64) -&gt; usize {
+    <span class="comment">// UNSTABLE: We cannot make an iterator from `BUDDY_SIZE` or use a for loop
+    //           in const context.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>order = <span class="number">0</span>;
+
+    <span class="kw">while </span>order &lt; BUDDY_SIZE.len() {
+        <span class="kw">let </span>buddy_size = BUDDY_SIZE[order];
+        <span class="kw">if </span>buddy_size &gt;= size {
+            <span class="kw">return </span>order;
+        }
+
+        order += <span class="number">1</span>;
+    }
+
+    <span class="macro">unreachable!</span>()
+}
 
 <span class="kw">pub struct </span>LockedFrameAllocator(Once&lt;Mutex&lt;GlobalFrameAllocator&gt;&gt;);
 
@@ -678,67 +727,62 @@
     }
 
     <span class="doccomment">/// Initializes the inner locked global frame allocator.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>init(<span class="kw-2">&amp;</span><span class="self">self</span>, memory_map: <span class="kw-2">&amp;mut </span>[NonNullPtr&lt;LimineMemmapEntry&gt;]) {
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>init(<span class="kw-2">&amp;</span><span class="self">self</span>, memory_map: <span class="kw-2">&amp;mut </span>[NonNullPtr&lt;MemmapEntry&gt;]) {
         <span class="self">self</span>.<span class="number">0
             </span>.call_once(|| Mutex::new(GlobalFrameAllocator::new(memory_map)));
+    }
+
+    <span class="kw">pub fn </span>alloc(<span class="kw-2">&amp;</span><span class="self">self</span>, size_bytes: usize) -&gt; <span class="prelude-ty">Option</span>&lt;PhysAddr&gt; {
+        <span class="kw">let </span>order = order_from_size(size_bytes <span class="kw">as </span>u64);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>allocator = <span class="self">self</span>.<span class="number">0</span>.get()<span class="question-mark">?</span>.lock_irq();
+        allocator.allocate_frame_inner(order)
+    }
+
+    <span class="kw">pub fn </span>alloc_zeroed(<span class="kw-2">&amp;</span><span class="self">self</span>, size_bytes: usize) -&gt; <span class="prelude-ty">Option</span>&lt;PhysAddr&gt; {
+        <span class="kw">let </span>addr = <span class="self">self</span>.alloc(size_bytes)<span class="question-mark">?</span>;
+        addr.as_hhdm_virt().as_bytes_mut(size_bytes).fill(<span class="number">0</span>);
+
+        <span class="prelude-val">Some</span>(addr)
     }
 }
 
 <span class="kw">unsafe impl </span>FrameAllocator&lt;Size4KiB&gt; <span class="kw">for </span>LockedFrameAllocator {
-    <span class="attr">#[track_caller]
-    </span><span class="kw">fn </span>allocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PhysFrame&lt;Size4KiB&gt;&gt; {
-        <span class="comment">// let caller = core::panic::Location::caller();
-        // log::debug!(&quot;allocation request of 4KiB by {:?}&quot;, caller);
+    <span class="kw">fn </span>allocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PhysFrame&lt;Size4KiB&gt;&gt; {
+        <span class="kw">let </span>phys = <span class="self">self</span>.alloc(Size4KiB::SIZE <span class="kw">as _</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(PhysFrame::containing_address(phys))
+    }
 
-        </span><span class="self">self</span>.<span class="number">0</span>.get().map(|m| {
-            m.lock_irq()
-                .allocate_frame_inner(<span class="number">0</span>)
-                .map(|f| PhysFrame::containing_address(f))
-        })<span class="question-mark">?
-    </span>}
-
-    <span class="attr">#[track_caller]
-    </span><span class="kw">fn </span>deallocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>, frame: PhysFrame&lt;Size4KiB&gt;) {
-        <span class="comment">// let caller = core::panic::Location::caller();
-        // log::debug!(&quot;deallocation request of 4KiB by {:?}&quot;, caller);
-
-        // self.0
-        //     .get()
-        //     .map(|m| m.lock().deallocate_frame_inner(frame.start_address(), 0))
-        //     .unwrap_or(());
-    </span>}
-}
-
-<span class="kw">unsafe impl </span>FrameAllocator&lt;Size2MiB&gt; <span class="kw">for </span>LockedFrameAllocator {
-    <span class="attr">#[track_caller]
-    </span><span class="kw">fn </span>allocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PhysFrame&lt;Size2MiB&gt;&gt; {
-        <span class="comment">// let caller = core::panic::Location::caller();
-        // log::debug!(&quot;allocation request of 2MiB by {:?}&quot;, caller);
-
-        </span><span class="self">self</span>.<span class="number">0</span>.get().map(|m| {
-            m.lock_irq()
-                .allocate_frame_inner(<span class="number">2</span>)
-                .map(|f| PhysFrame::containing_address(f))
-        })<span class="question-mark">?
-    </span>}
-
-    <span class="attr">#[track_caller]
-    </span><span class="kw">fn </span>deallocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>, frame: PhysFrame&lt;Size2MiB&gt;) {
-        <span class="comment">// let caller = core::panic::Location::caller();
-        // log::debug!(&quot;deallocation request of 2MiB by {:?}&quot;, caller);
-
-        </span><span class="self">self</span>.<span class="number">0
+    <span class="kw">fn </span>deallocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>, frame: PhysFrame&lt;Size4KiB&gt;) {
+        <span class="self">self</span>.<span class="number">0
             </span>.get()
             .map(|m| {
                 m.lock_irq()
-                    .deallocate_frame_inner(frame.start_address(), <span class="number">2</span>)
+                    .deallocate_frame_inner(frame.start_address(), order_from_size(Size4KiB::SIZE))
             })
-            .unwrap_or(());
+            .unwrap()
+    }
+}
+
+<span class="kw">unsafe impl </span>FrameAllocator&lt;Size2MiB&gt; <span class="kw">for </span>LockedFrameAllocator {
+    <span class="kw">fn </span>allocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PhysFrame&lt;Size2MiB&gt;&gt; {
+        <span class="kw">let </span>phys = <span class="self">self</span>.alloc(Size2MiB::SIZE <span class="kw">as _</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(PhysFrame::containing_address(phys))
+    }
+
+    <span class="kw">fn </span>deallocate_frame(<span class="kw-2">&amp;</span><span class="self">self</span>, frame: PhysFrame&lt;Size2MiB&gt;) {
+        <span class="self">self</span>.<span class="number">0
+            </span>.get()
+            .map(|m| {
+                m.lock_irq()
+                    .deallocate_frame_inner(frame.start_address(), order_from_size(Size2MiB::SIZE))
+            })
+            .unwrap()
     }
 }
 
 <span class="kw">struct </span>RangeMemoryIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-    iter: core::slice::Iter&lt;<span class="lifetime">&#39;a</span>, NonNullPtr&lt;LimineMemmapEntry&gt;&gt;,
+    iter: core::slice::Iter&lt;<span class="lifetime">&#39;a</span>, NonNullPtr&lt;MemmapEntry&gt;&gt;,
 
     cursor_base: PhysAddr,
     cursor_end: PhysAddr,
@@ -754,7 +798,7 @@
                 // the memory map and set the cursor to the start of it.
                 </span><span class="kw">let </span>next = <span class="self">self</span>.iter.next()<span class="question-mark">?</span>;
 
-                <span class="kw">if </span>next.typ == LimineMemoryMapEntryType::Usable {
+                <span class="kw">if </span>next.typ == MemoryMapEntryType::Usable {
                     <span class="kw">break </span><span class="prelude-val">Some</span>(next);
                 }
             } {
@@ -782,7 +826,7 @@
 <span class="attr">#[repr(usize)]
 </span><span class="kw">pub enum </span>BuddyOrdering {
     Size4KiB = <span class="number">0</span>,
-    Size8KiB = <span class="number">2</span>,
+    Size8KiB = <span class="number">1</span>,
 }
 
 <span class="comment">// FIXME: REMOVE THIS FUNCTION
@@ -790,15 +834,9 @@
     <span class="kw">let </span>order = order <span class="kw">as </span>usize;
     <span class="macro">debug_assert!</span>(order &lt;= BUDDY_SIZE.len());
 
-    <span class="kw">let </span>addr = <span class="kw">super</span>::FRAME_ALLOCATOR
-        .<span class="number">0
-        </span>.get()
-        .expect(<span class="string">&quot;pmm: frame allocator not initialized&quot;</span>)
-        .lock()
-        .allocate_frame_inner(order)
-        .expect(<span class="string">&quot;pmm: out of memory&quot;</span>);
-
-    addr
+    <span class="kw">super</span>::FRAME_ALLOCATOR
+        .alloc_zeroed(BUDDY_SIZE[order] <span class="kw">as _</span>)
+        .unwrap()
 }
 
 <span class="attr">#[derive(Debug)]
@@ -879,36 +917,33 @@
 
 <span class="kw">static </span>VM_FRAMES: Once&lt;Vec&lt;VmFrame&gt;&gt; = Once::new();
 
-<span class="doccomment">/// Buddy allocator combines power-of-two allocator with free buffer
-/// coalescing.
+<span class="doccomment">/// Buddy allocator combines power-of-two allocator with free buffer coalescing.
 ///
 /// ## Overview
 ///
 /// Overview of the buddy allocation algorithm:
 ///
-/// * Memory is broken up into large blocks of pages where each block
-///   is a power of two number of pages.
+/// * Memory is broken up into large blocks of pages where each block is a power of two number of
+///   pages.
 ///
-/// * If a block of the desired size is not available, a larger block is
-///   broken up in half and the two blocks are marked as buddies then one half
-///   is used for the allocation and the other half is marked free.
+/// * If a block of the desired size is not available, a larger block is broken up in half and the
+///   two blocks are marked as buddies then one half is used for the allocation and the other half
+///   is marked free.
 ///
-/// * The blocks are continuously halved as necessary until a block of the
-///   desired size is available.
+/// * The blocks are continuously halved as necessary until a block of the desired size is
+///   available.
 ///
-/// * When a block is later freed, the buddy is examined and the two coalesced
-///   if it is free.
+/// * When a block is later freed, the buddy is examined and the two coalesced if it is free.
 </span><span class="kw">pub struct </span>GlobalFrameAllocator {
-    buddies: [Bitmap&lt;BootAllocRef&gt;; <span class="number">3</span>],
-    free: [usize; <span class="number">3</span>],
+    buddies: [Bitmap&lt;BootAllocRef&gt;; <span class="number">10</span>],
+    free: [usize; <span class="number">10</span>],
 
     base: PhysAddr,
     end: PhysAddr,
 }
 
 <span class="kw">impl </span>GlobalFrameAllocator {
-    <span class="doccomment">/// Create a new global frame allocator from the memory map provided by the bootloader.
-    </span><span class="kw">fn </span>new(memory_map: <span class="kw-2">&amp;mut </span>[NonNullPtr&lt;LimineMemmapEntry&gt;]) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>new(memory_map: <span class="kw-2">&amp;mut </span>[NonNullPtr&lt;MemmapEntry&gt;]) -&gt; <span class="self">Self </span>{
         <span class="comment">// Find a memory map entry that is big enough to fit all of the items in
         // range memory iter.
         </span><span class="kw">let </span>requested_size = (core::mem::size_of::&lt;MemoryRange&gt;() * memory_map.len()) <span class="kw">as </span>u64;
@@ -918,7 +953,7 @@
             <span class="kw">let </span>entry = <span class="kw-2">&amp;mut </span>memory_map[i];
 
             <span class="comment">// Make sure that the memory map entry is marked as usable.
-            </span><span class="kw">if </span>entry.typ != LimineMemoryMapEntryType::Usable {
+            </span><span class="kw">if </span>entry.typ != MemoryMapEntryType::Usable {
                 <span class="kw">continue</span>;
             }
 
@@ -982,8 +1017,15 @@
                 Bitmap::empty(bref.clone()),
                 Bitmap::empty(bref.clone()),
                 Bitmap::empty(bref.clone()),
+                Bitmap::empty(bref.clone()),
+                Bitmap::empty(bref.clone()),
+                Bitmap::empty(bref.clone()),
+                Bitmap::empty(bref.clone()),
+                Bitmap::empty(bref.clone()),
+                Bitmap::empty(bref.clone()),
+                Bitmap::empty(bref.clone()),
             ],
-            free: [<span class="number">0</span>; <span class="number">3</span>],
+            free: [<span class="number">0</span>; <span class="number">10</span>],
         };
 
         <span class="kw">let </span>size = this.end - this.base;
@@ -1087,7 +1129,7 @@
         <span class="kw">let </span>idx = <span class="self">self</span>.get_bit_idx(addr, order);
 
         <span class="kw">let </span>buddy = <span class="kw-2">&amp;mut </span><span class="self">self</span>.buddies[order];
-        <span class="kw">let </span>change = buddy.is_set(idx) == <span class="bool-val">true</span>;
+        <span class="kw">let </span>change = buddy.is_set(idx);
 
         <span class="kw">if </span>change {
             buddy.set(idx, <span class="bool-val">false</span>);
@@ -1262,5 +1304,4 @@
             .is_free(frame.start_address(), <span class="number">0</span>));
     }
 }
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aero_kernel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (f63ccaf25 2023-03-06)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>
