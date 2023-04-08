@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `aero_kernel/src/drivers/pty.rs`."><title>pty.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fbd14db5c88ed452.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="aero_kernel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (cf7ada217 2023-04-03)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-d4a1a279bad1a0c0.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-8e6affb8c73a5ff1.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../aero_kernel/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `aero_kernel/src/drivers/pty.rs`."><title>pty.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="aero_kernel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (23ee2af2f 2023-04-07)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-d4a1a279bad1a0c0.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-8e6affb8c73a5ff1.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../aero_kernel/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -418,7 +418,36 @@
 <a href="#418" id="418">418</a>
 <a href="#419" id="419">419</a>
 <a href="#420" id="420">420</a>
-</pre><pre class="rust"><code><span class="comment">/*
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+</pre></div><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021-2023 The Aero Project Developers.
  *
  * This file is part of The Aero Project.
@@ -463,6 +492,10 @@
 <span class="kw">use </span><span class="kw">crate</span>::fs::{<span class="self">self</span>, FileSystemError};
 
 <span class="kw">use </span><span class="kw">crate</span>::mem::paging::VirtAddr;
+<span class="kw">use </span><span class="kw">crate</span>::userland::scheduler;
+<span class="kw">use </span><span class="kw">crate</span>::userland::task::Task;
+<span class="kw">use </span><span class="kw">crate</span>::userland::terminal::LineDiscipline;
+<span class="kw">use </span><span class="kw">crate</span>::userland::terminal::TerminalDevice;
 <span class="kw">use </span><span class="kw">crate</span>::utils::sync::BlockQueue;
 <span class="kw">use </span><span class="kw">crate</span>::utils::sync::Mutex;
 
@@ -477,8 +510,9 @@
     id: u32,
     wq: BlockQueue,
     window_size: Mutex&lt;WinSize&gt;,
-    slave_buffer: Mutex&lt;Vec&lt;u8&gt;&gt;,
     buffer: Mutex&lt;Vec&lt;u8&gt;&gt;,
+
+    discipline: LineDiscipline,
 }
 
 <span class="kw">impl </span>Master {
@@ -487,8 +521,9 @@
             id: PTY_ID.fetch_add(<span class="number">1</span>, Ordering::SeqCst),
             wq: BlockQueue::new(),
             window_size: Mutex::new(WinSize::default()),
-            slave_buffer: Mutex::new(Vec::new()),
             buffer: Mutex::new(Vec::new()),
+
+            discipline: LineDiscipline::new(),
         }
     }
 }
@@ -507,10 +542,7 @@
     }
 
     <span class="kw">fn </span>write_at(<span class="kw-2">&amp;</span><span class="self">self</span>, _offset: usize, buffer: <span class="kw-2">&amp;</span>[u8]) -&gt; fs::Result&lt;usize&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>pty_buffer = <span class="self">self</span>.slave_buffer.lock_irq();
-        pty_buffer.extend_from_slice(buffer);
-
-        <span class="self">self</span>.wq.notify_complete();
+        <span class="self">self</span>.discipline.write(buffer);
         <span class="prelude-val">Ok</span>(buffer.len())
     }
 
@@ -546,6 +578,13 @@
     }
 }
 
+<span class="kw">impl </span>TerminalDevice <span class="kw">for </span>Master {
+    <span class="kw">fn </span>attach(<span class="kw-2">&amp;</span><span class="self">self</span>, task: Arc&lt;Task&gt;) {
+        <span class="macro">assert!</span>(task.is_session_leader());
+        <span class="self">self</span>.discipline.set_foreground(task);
+    }
+}
+
 <span class="kw">struct </span>SlaveInner {
     termios: Termios,
 }
@@ -557,20 +596,42 @@
 
 <span class="kw">impl </span>Slave {
     <span class="kw">pub fn </span>new(master: Arc&lt;Master&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">use </span>aero_syscall::<span class="kw-2">*</span>;
+
+        <span class="comment">// converts ^X into X
+        </span><span class="kw">let </span>ctrl = |c| (c <span class="kw">as </span>u8 - <span class="number">0x40</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>termios = Termios {
+            c_iflag: aero_syscall::TermiosIFlag::empty(),
+            c_oflag: aero_syscall::TermiosOFlag::ONLCR,
+            c_cflag: aero_syscall::TermiosCFlag::empty(),
+            c_lflag: TermiosLFlag::ECHOKE
+                | TermiosLFlag::ECHOE
+                | TermiosLFlag::ECHOK
+                | TermiosLFlag::ECHO
+                | TermiosLFlag::ECHOCTL
+                | TermiosLFlag::ISIG
+                | TermiosLFlag::ICANON
+                | TermiosLFlag::IEXTEN,
+            c_line: <span class="number">0</span>,
+            c_cc: [<span class="number">0</span>; <span class="number">32</span>],
+            c_ispeed: <span class="number">0</span>,
+            c_ospeed: <span class="number">0</span>,
+        };
+
+        termios.c_cc[VINTR] = ctrl(<span class="string">&#39;C&#39;</span>);
+        termios.c_cc[VQUIT] = ctrl(<span class="string">&#39;\\&#39;</span>);
+        termios.c_cc[VERASE] = <span class="number">127</span>; <span class="comment">// DEL character
+        </span>termios.c_cc[VKILL] = ctrl(<span class="string">&#39;U&#39;</span>);
+        termios.c_cc[VEOF] = ctrl(<span class="string">&#39;D&#39;</span>);
+        termios.c_cc[VMIN] = <span class="number">1</span>;
+        termios.c_cc[VSTART] = ctrl(<span class="string">&#39;Q&#39;</span>);
+        termios.c_cc[VSTOP] = ctrl(<span class="string">&#39;S&#39;</span>);
+        termios.c_cc[VSUSP] = ctrl(<span class="string">&#39;Z&#39;</span>);
+
         <span class="self">Self </span>{
             master,
-            inner: Mutex::new(SlaveInner {
-                termios: Termios {
-                    c_iflag: aero_syscall::TermiosIFlag::empty(),
-                    c_oflag: aero_syscall::TermiosOFlag::ONLCR,
-                    c_cflag: aero_syscall::TermiosCFlag::empty(),
-                    c_lflag: aero_syscall::TermiosLFlag::ECHO | aero_syscall::TermiosLFlag::ICANON,
-                    c_line: <span class="number">0</span>,
-                    c_cc: [<span class="number">0</span>; <span class="number">32</span>],
-                    c_ispeed: <span class="number">0</span>,
-                    c_ospeed: <span class="number">0</span>,
-                },
-            }),
+            inner: Mutex::new(SlaveInner { termios }),
         }
     }
 }
@@ -615,8 +676,10 @@
             }
 
             aero_syscall::TIOCSCTTY =&gt; {
-                <span class="comment">// TODO(alacritty): stub!
-                </span><span class="macro">log::error!</span>(<span class="string">&quot;TIOCSCTTY is a stub!&quot;</span>);
+                <span class="kw">let </span>current_task = scheduler::get_scheduler().current_task();
+                <span class="macro">assert!</span>(current_task.is_session_leader());
+
+                current_task.attach(<span class="self">self</span>.master.clone());
                 <span class="prelude-val">Ok</span>(<span class="number">0</span>)
             }
 
@@ -625,11 +688,14 @@
     }
 
     <span class="kw">fn </span>poll(<span class="kw-2">&amp;</span><span class="self">self</span>, table: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>fs::inode::PollTable&gt;) -&gt; fs::Result&lt;PollFlags&gt; {
-        table.map(|e| e.insert(<span class="kw-2">&amp;</span><span class="self">self</span>.master.wq));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(table) = table {
+            table.insert(<span class="kw-2">&amp;</span><span class="self">self</span>.master.wq);
+            table.insert(<span class="self">self</span>.master.discipline.wait_queue());
+        }
 
         <span class="kw">let </span><span class="kw-2">mut </span>flags = PollFlags::OUT;
 
-        <span class="kw">if </span>!<span class="self">self</span>.master.slave_buffer.lock_irq().is_empty() {
+        <span class="kw">if </span>!<span class="self">self</span>.master.discipline.is_empty() {
             flags |= PollFlags::IN;
         }
 
@@ -637,15 +703,7 @@
     }
 
     <span class="kw">fn </span>read_at(<span class="kw-2">&amp;</span><span class="self">self</span>, _offset: usize, buffer: <span class="kw-2">&amp;mut </span>[u8]) -&gt; fs::Result&lt;usize&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>pty_buffer = <span class="self">self
-            </span>.master
-            .wq
-            .block_on(<span class="kw-2">&amp;</span><span class="self">self</span>.master.slave_buffer, |e| !e.is_empty())<span class="question-mark">?</span>;
-
-        <span class="kw">let </span>size = core::cmp::min(pty_buffer.len(), buffer.len());
-
-        buffer[..size].copy_from_slice(<span class="kw-2">&amp;</span>pty_buffer.drain(..size).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;());
-        <span class="prelude-val">Ok</span>(size)
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.master.discipline.read(buffer)<span class="question-mark">?</span>)
     }
 
     <span class="kw">fn </span>write_at(<span class="kw-2">&amp;</span><span class="self">self</span>, _offset: usize, buffer: <span class="kw-2">&amp;</span>[u8]) -&gt; fs::Result&lt;usize&gt; {

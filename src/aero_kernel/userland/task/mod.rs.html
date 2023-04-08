@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `aero_kernel/src/userland/task.rs`."><title>task.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fbd14db5c88ed452.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="aero_kernel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (cf7ada217 2023-04-03)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-d4a1a279bad1a0c0.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-8e6affb8c73a5ff1.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../aero_kernel/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `aero_kernel/src/userland/task/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aero_kernel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (23ee2af2f 2023-04-07)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-d4a1a279bad1a0c0.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-8e6affb8c73a5ff1.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../aero_kernel/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -655,7 +655,81 @@
 <a href="#655" id="655">655</a>
 <a href="#656" id="656">656</a>
 <a href="#657" id="657">657</a>
-</pre><pre class="rust"><code><span class="comment">/*
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+</pre></div><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021-2023 The Aero Project Developers.
  *
  * This file is part of The Aero Project.
@@ -674,13 +748,15 @@
  * along with Aero. If not, see &lt;https://www.gnu.org/licenses/&gt;.
  */
 
-</span><span class="kw">use </span>aero_syscall::WaitPidFlags;
+</span><span class="kw">pub mod </span>sessions;
+
+<span class="kw">use </span>aero_syscall::WaitPidFlags;
 <span class="kw">use </span>alloc::sync::{Arc, Weak};
 
-<span class="kw">use </span>spin::RwLock;
+<span class="kw">use </span>spin::{Once, RwLock};
 
 <span class="kw">use </span>core::cell::UnsafeCell;
-<span class="kw">use </span>core::sync::atomic::{AtomicBool, AtomicIsize, AtomicU8, AtomicUsize, Ordering};
+<span class="kw">use </span>core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
 <span class="kw">use </span><span class="kw">crate</span>::fs::cache::{DirCacheImpl, DirCacheItem};
 <span class="kw">use </span><span class="kw">crate</span>::fs::{<span class="self">self</span>, FileSystem};
@@ -695,8 +771,9 @@
 
 <span class="kw">use </span>intrusive_collections::{intrusive_adapter, LinkedList, LinkedListLink};
 
-<span class="kw">use </span><span class="kw">super</span>::scheduler;
+<span class="kw">use </span><span class="kw">super</span>::scheduler::{<span class="self">self</span>, ExitStatus};
 <span class="kw">use </span><span class="kw">super</span>::signals::{SignalResult, TriggerResult};
+<span class="kw">use </span><span class="kw">super</span>::terminal::TerminalDevice;
 <span class="kw">use </span><span class="kw">super</span>::vm::Vm;
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -801,7 +878,7 @@
             <span class="kw">while let </span><span class="prelude-val">Some</span>(t) = cursor.get() {
                 <span class="kw">for </span>pid <span class="kw">in </span>pids {
                     <span class="kw">if </span>t.pid().as_usize() == <span class="kw-2">*</span>pid {
-                        captured = <span class="prelude-val">Some</span>((t.pid(), t.exit_status()));
+                        captured = <span class="prelude-val">Some</span>((t.pid(), t.exit_status().clone()));
                         cursor.remove();
 
                         <span class="kw">return </span><span class="bool-val">true</span>;
@@ -818,13 +895,22 @@
             <span class="bool-val">false
         </span>})<span class="question-mark">?</span>;
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((tid, st)) = captured {
-            <span class="macro">log::debug!</span>(<span class="string">&quot;waitpid: status = {st}&quot;</span>);
-            <span class="kw-2">*</span>status = st <span class="kw">as </span>u32;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((tid, exit_status)) = captured {
+            <span class="comment">// mlibc/abis/linux/wait.h (`W_EXITCODE`)
+            </span><span class="kw">match </span>exit_status {
+                ExitStatus::Normal(code) =&gt; {
+                    <span class="kw-2">*</span>status = ((code <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>) | <span class="number">0</span>;
+                }
+
+                ExitStatus::Signal(signal) =&gt; {
+                    <span class="kw-2">*</span>status = (<span class="number">0 </span>&lt;&lt; <span class="number">8</span>) | signal <span class="kw">as </span>u32;
+                }
+            }
+
             <span class="prelude-val">Ok</span>(tid.as_usize())
         } <span class="kw">else </span>{
             <span class="comment">// If `WNOHANG` was specified in flags and there were no children in a waitable
-            // state, then waitid() returns 0 immediately.
+            // state, then waipid() returns 0 immediately.
             </span><span class="kw-2">*</span>status = <span class="number">0</span>;
             <span class="prelude-val">Ok</span>(<span class="number">0</span>)
         }
@@ -839,6 +925,9 @@
 
     pid: TaskId,
     tid: TaskId,
+
+    sid: AtomicUsize,
+    gid: AtomicUsize,
 
     parent: Mutex&lt;<span class="prelude-ty">Option</span>&lt;Arc&lt;Task&gt;&gt;&gt;,
     children: Mutex&lt;intrusive_collections::LinkedList&lt;TaskAdapter&gt;&gt;,
@@ -861,8 +950,9 @@
 
     cwd: RwLock&lt;<span class="prelude-ty">Option</span>&lt;Cwd&gt;&gt;,
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) exit_status: AtomicIsize,
+    <span class="kw">pub</span>(<span class="kw">super</span>) exit_status: Once&lt;ExitStatus&gt;,
 
+    controlling_terminal: Mutex&lt;<span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>TerminalDevice&gt;&gt;&gt;,
     systrace: AtomicBool,
 }
 
@@ -883,6 +973,8 @@
             message_queue: MessageQueue::new(),
 
             tid: pid.clone(),
+            sid: AtomicUsize::new(pid.as_usize()),
+            gid: AtomicUsize::new(pid.as_usize()),
             pid,
 
             executable: Mutex::new(<span class="prelude-val">None</span>),
@@ -896,7 +988,7 @@
             pending_io: AtomicBool::new(<span class="bool-val">false</span>),
 
             sleep_duration: AtomicUsize::new(<span class="number">0</span>),
-            exit_status: AtomicIsize::new(<span class="number">0</span>),
+            exit_status: Once::new(),
 
             children: Mutex::new(Default::default()),
             parent: Mutex::new(<span class="prelude-val">None</span>),
@@ -905,6 +997,7 @@
             cwd: RwLock::new(<span class="prelude-val">None</span>),
 
             systrace: AtomicBool::new(<span class="bool-val">false</span>),
+            controlling_terminal: Mutex::new(<span class="prelude-val">None</span>),
         })
     }
 
@@ -926,13 +1019,15 @@
             state: AtomicU8::new(TaskState::Runnable <span class="kw">as _</span>),
 
             tid: pid.clone(),
+            gid: AtomicUsize::new(pid.as_usize()),
+            sid: AtomicUsize::new(pid.as_usize()),
             pid,
 
             link: Default::default(),
             clink: Default::default(),
 
             sleep_duration: AtomicUsize::new(<span class="number">0</span>),
-            exit_status: AtomicIsize::new(<span class="number">0</span>),
+            exit_status: Once::new(),
 
             executable: Mutex::new(<span class="prelude-val">None</span>),
             pending_io: AtomicBool::new(<span class="bool-val">false</span>),
@@ -944,6 +1039,7 @@
             cwd: RwLock::new(<span class="prelude-val">None</span>),
 
             systrace: AtomicBool::new(<span class="bool-val">false</span>),
+            controlling_terminal: Mutex::new(<span class="prelude-val">None</span>),
         })
     }
 
@@ -964,9 +1060,11 @@
             clink: Default::default(),
 
             sleep_duration: AtomicUsize::new(<span class="number">0</span>),
-            exit_status: AtomicIsize::new(<span class="number">0</span>),
+            exit_status: Once::new(),
 
             tid: pid.clone(),
+            sid: AtomicUsize::new(<span class="self">self</span>.session_id()),
+            gid: AtomicUsize::new(<span class="self">self</span>.group_id()),
             pid,
 
             executable: Mutex::new(<span class="self">self</span>.executable.lock().clone()),
@@ -979,6 +1077,7 @@
             signals: Signals::new(),
 
             systrace: AtomicBool::new(<span class="self">self</span>.systrace()),
+            controlling_terminal: Mutex::new(<span class="self">self</span>.controlling_terminal.lock_irq().clone()),
         });
 
         <span class="self">self</span>.add_child(this.clone());
@@ -1023,9 +1122,11 @@
             clink: Default::default(),
 
             sleep_duration: AtomicUsize::new(<span class="number">0</span>),
-            exit_status: AtomicIsize::new(<span class="number">0</span>),
+            exit_status: Once::new(),
 
             tid: pid.clone(),
+            sid: AtomicUsize::new(<span class="self">self</span>.session_id()),
+            gid: AtomicUsize::new(<span class="self">self</span>.group_id()),
             pid,
 
             executable: Mutex::new(<span class="self">self</span>.executable.lock().clone()),
@@ -1038,6 +1139,12 @@
             signals: Signals::new(),
 
             systrace: AtomicBool::new(<span class="self">self</span>.process_leader().systrace()),
+            controlling_terminal: Mutex::new(
+                <span class="self">self</span>.process_leader()
+                    .controlling_terminal
+                    .lock_irq()
+                    .clone(),
+            ),
         });
 
         <span class="self">self</span>.add_child(this.clone());
@@ -1082,8 +1189,8 @@
         children.push_back(child);
     }
 
-    <span class="kw">fn </span>exit_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
-        <span class="self">self</span>.exit_status.load(Ordering::SeqCst)
+    <span class="kw">fn </span>exit_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ExitStatus {
+        <span class="self">self</span>.exit_status.get().unwrap()
     }
 
     <span class="kw">pub fn </span>set_sleep_duration(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: usize) {
@@ -1222,7 +1329,7 @@
         <span class="self">self</span>.cwd.write().as_mut().unwrap().filesystem = filesystem;
     }
 
-    <span class="kw">fn </span>get_parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;Task&gt;&gt; {
+    <span class="kw">pub fn </span>get_parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;Task&gt;&gt; {
         <span class="kw">let </span>parent = <span class="self">self</span>.parent.lock();
         parent.clone()
     }
@@ -1291,8 +1398,8 @@
             parent.zombies.add_zombie(<span class="self">self</span>.this());
 
             <span class="kw">if </span><span class="self">self</span>.is_process_leader() {
-                <span class="comment">// parent.signal(aero_syscall::signal::SIGCHLD);
-            </span>}
+                parent.signal(aero_syscall::signal::SIGCHLD);
+            }
         }
     }
 
@@ -1302,6 +1409,47 @@
 
     <span class="kw">pub fn </span>enable_systrace(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.systrace.store(<span class="bool-val">true</span>, Ordering::SeqCst);
+    }
+
+    <span class="kw">pub fn </span>attach(<span class="kw-2">&amp;</span><span class="self">self</span>, terminal: Arc&lt;<span class="kw">dyn </span>TerminalDevice&gt;) {
+        <span class="kw">if </span><span class="self">self</span>.is_session_leader() {
+            terminal.attach(<span class="self">self</span>.sref.upgrade().unwrap());
+            <span class="kw-2">*</span><span class="self">self</span>.controlling_terminal.lock_irq() = <span class="prelude-val">Some</span>(terminal);
+        } <span class="kw">else </span>{
+            <span class="comment">// FIXME: If its not the session leader then we needs to be a part of the the same
+            // session as the terminal&#39;s foreground group.
+            // todo!()
+        </span>}
+    }
+
+    <span class="doccomment">/// Returns whether the task is the session leader (`pid` == `sid`).
+    </span><span class="kw">pub fn </span>is_session_leader(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.session_id() == <span class="self">self</span>.pid().as_usize()
+    }
+
+    <span class="doccomment">/// Returns whether the task is the group leader (`pid` == `gid`).
+    </span><span class="kw">pub fn </span>is_group_leader(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.group_id() == <span class="self">self</span>.pid().as_usize()
+    }
+
+    <span class="doccomment">/// Returns the group identifier of the task (`GID`).
+    </span><span class="kw">pub fn </span>group_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.gid.load(Ordering::SeqCst)
+    }
+
+    <span class="doccomment">/// Returns the session identifier of the task (`SID`).
+    </span><span class="kw">pub fn </span>session_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.sid.load(Ordering::SeqCst)
+    }
+
+    <span class="doccomment">/// Sets the session identifier of the task (`SID`) to `session_id`.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_session_id(<span class="kw-2">&amp;</span><span class="self">self</span>, session_id: usize) {
+        <span class="self">self</span>.sid.store(session_id, Ordering::SeqCst);
+    }
+
+    <span class="doccomment">/// Sets the group identifier of the task (`GID`) to `group_id`.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_group_id(<span class="kw-2">&amp;</span><span class="self">self</span>, group_id: usize) {
+        <span class="self">self</span>.gid.store(group_id, Ordering::SeqCst);
     }
 }
 
