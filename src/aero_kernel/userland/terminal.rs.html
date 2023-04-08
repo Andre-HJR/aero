@@ -147,6 +147,7 @@
     /// The processs group of `task` will be set as the active process group that is associated with
     /// the terminal (foreground).
     </span><span class="kw">fn </span>attach(<span class="kw-2">&amp;</span><span class="self">self</span>, task: Arc&lt;Task&gt;);
+    <span class="kw">fn </span>detach(<span class="kw-2">&amp;</span><span class="self">self</span>, task: Arc&lt;Task&gt;);
 }
 
 <span class="doccomment">/// Line Discipline
@@ -191,7 +192,6 @@
                 <span class="comment">// ETX: End of Text (`Ctrl+C`)
                 </span><span class="number">0x3 </span>=&gt; {
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(foreground) = <span class="self">self</span>.foreground() {
-                        <span class="macro">log::warn!</span>(<span class="string">&quot;LineDiscipline: recieved End of Text (`Ctrl+C`)&quot;</span>);
                         foreground.signal(signal::SIGINT);
                     }
                 }
