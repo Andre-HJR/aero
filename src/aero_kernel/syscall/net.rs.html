@@ -190,6 +190,23 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>aero_syscall::socket::MessageFlags;
 <span class="kw">use </span>num_traits::cast::FromPrimitive;
 
@@ -202,7 +219,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::fs::inode::INodeInterface;
 <span class="kw">use </span><span class="kw">crate</span>::mem::paging::VirtAddr;
 
-<span class="kw">use </span><span class="kw">crate</span>::socket::inet::InetSocket;
+<span class="kw">use </span><span class="kw">crate</span>::socket::tcp::TcpSocket;
+<span class="kw">use </span><span class="kw">crate</span>::socket::udp::UdpSocket;
 <span class="kw">use </span><span class="kw">crate</span>::socket::unix::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::socket::SocketAddr;
 
@@ -311,7 +329,23 @@
 
     <span class="kw">let </span>socket = <span class="kw">match </span>domain <span class="kw">as </span>u32 {
         AF_UNIX =&gt; UnixSocket::new() <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>INodeInterface&gt;,
-        AF_INET =&gt; InetSocket::new(typ, protocol)<span class="question-mark">? </span><span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>INodeInterface&gt;,
+        AF_INET =&gt; <span class="kw">match </span>(typ, protocol) {
+            (SocketType::Dgram, IpProtocol::Default | IpProtocol::Udp) =&gt; {
+                UdpSocket::new() <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>INodeInterface&gt;
+            }
+
+            (SocketType::Stream, IpProtocol::Default | IpProtocol::Tcp) =&gt; {
+                TcpSocket::new() <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>INodeInterface&gt;
+            }
+
+            <span class="kw">_ </span>=&gt; {
+                <span class="macro">log::warn!</span>(
+                    <span class="string">&quot;unsupported socket type: domain={domain}, socket_type={socket_type}, protocol={protocol:?}&quot;
+                </span>);
+
+                <span class="kw">return </span><span class="prelude-val">Err</span>(SyscallError::EINVAL);
+            }
+        },
 
         <span class="kw">_ </span>=&gt; {
             <span class="macro">log::warn!</span>(

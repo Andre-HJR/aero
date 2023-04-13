@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["SocketAddr"],"mod":["inet","unix"]};
+window.SIDEBAR_ITEMS = {"enum":["SocketAddr"],"mod":["tcp","udp","unix"]};

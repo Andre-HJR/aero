@@ -65,6 +65,7 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
 </pre></div><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021-2023 The Aero Project Developers.
  *
@@ -84,7 +85,8 @@
  * along with Aero. If not, see &lt;https://www.gnu.org/licenses/&gt;.
  */
 
-</span><span class="kw">pub mod </span>inet;
+</span><span class="kw">pub mod </span>tcp;
+<span class="kw">pub mod </span>udp;
 <span class="kw">pub mod </span>unix;
 
 <span class="kw">use </span>aero_syscall::{prelude::IfReq, <span class="kw-2">*</span>};

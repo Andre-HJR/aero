@@ -140,6 +140,7 @@
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre></div><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021-2023 The Aero Project Developers.
  *
@@ -181,7 +182,7 @@
         size += Udp::HSIZE;
 
         <span class="kw">let </span>ip_packet = Packet::&lt;Ipv4&gt;::create(ip::Type::Udp, target, size);
-        <span class="kw">let </span><span class="kw-2">mut </span>packet = ip_packet.upgrade();
+        <span class="kw">let </span><span class="kw-2">mut </span>packet: Packet&lt;Udp&gt; = ip_packet.upgrade();
 
         <span class="kw">let </span>header = packet.header_mut();
 
@@ -210,11 +211,12 @@
         <span class="kw">let </span>dest_port = header.dst_port().to_native();
 
         <span class="kw">let </span>handlers = HANDLERS.read();
-        <span class="kw">let </span>handler = handlers
-            .get(<span class="kw-2">&amp;</span>dest_port)
-            .expect(<span class="string">&quot;udp: no handler registered&quot;</span>);
 
-        handler.recv(<span class="self">self</span>.clone())
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = handlers.get(<span class="kw-2">&amp;</span>dest_port) {
+            handler.recv(<span class="self">self</span>.clone());
+        } <span class="kw">else </span>{
+            <span class="macro">log::warn!</span>(<span class="string">&quot;udp: no handler registered for port {}&quot;</span>, dest_port);
+        }
     }
 }
 
