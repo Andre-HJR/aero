@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get","init"],"static":["CACHE"],"struct":["Cache","Entry"]};
+window.SIDEBAR_ITEMS = {"enum":["HType","Opcode","PType","Status"],"fn":["get","init","request_ip"],"static":["CACHE"],"struct":["Arp","ArpHeader","Cache","Entry"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["IoVec","MessageHeader"]};
+window.SIDEBAR_ITEMS = {"struct":["IoVec","MessageFlags","MessageHeader"]};
