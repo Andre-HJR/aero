@@ -198,6 +198,11 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright (C) 2021-2023 The Aero Project Developers.
 //
 // This file is part of The Aero Project.
@@ -323,8 +328,13 @@
         (flags.to_native().get_bits(<span class="number">12</span>..=<span class="number">15</span>) * <span class="number">4</span>) <span class="kw">as </span>u8
     }
 
-    <span class="kw">pub fn </span>set_ack_number(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u32) {
+    <span class="doccomment">/// Sets the ACK number to `val` and sets the [`TcpFlags::ACK`] flag.
+    </span><span class="kw">pub fn </span>set_ack_number(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u32) {
         <span class="self">self</span>.ack_nr = val.into();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>flags = <span class="self">self</span>.flags();
+        flags.insert(TcpFlags::ACK);
+        <span class="self">self</span>.set_flags(flags);
     }
 
     <span class="kw">pub fn </span>set_header_len(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u8) {
